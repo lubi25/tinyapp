@@ -33,16 +33,16 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/urls/:id", (req, res) => {
-  const templateVars = { id: req.params.id, longURL: req.params.longURL };
+  const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id] };
   res.render("urls_show", templateVars);
 });
 
 app.post("/urls", (req, res) => {
   console.log(req.body); // Log the POST request body to the console
-  res.send("Ok"); // Respond with 'Ok' (we will replace this)
   const longURL = req.body.longURL;
   const shortURL = generateRandomString();
   urlDatabase[shortURL] = longURL;
+  res.redirect(`/urls/${shortURL}`);
 });
 
 function generateRandomString() {
