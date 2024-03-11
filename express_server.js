@@ -63,3 +63,14 @@ function generateRandomString() {
   }
   return shortURL;
 }
+
+app.post("/urls/:id/delete", (req, res) => {
+  const shortURL = req.params.id;
+  if (urlDatabase.hasOwnProperty(shortURL)) {
+    delete urlDatabase[shortURL];
+    res.redirect("/urls");
+  }
+  else {
+    res.status(404).send("URL not found");
+  }
+});
