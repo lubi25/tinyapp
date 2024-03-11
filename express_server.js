@@ -74,3 +74,15 @@ app.post("/urls/:id/delete", (req, res) => {
     res.status(404).send("URL not found");
   }
 });
+
+app.post("/urls/:id/update", (req, res) => {
+  const shortURL = req.params.id;
+  const newURL = req.body.newURL;
+
+  if (urlDatabase.hasOwnProperty(shortURL)) {
+    urlDatabase[shortURL] = newURL;
+    res.redirect("/urls");
+  } else {
+    res.status(404).send("URL not found");
+  }
+});
