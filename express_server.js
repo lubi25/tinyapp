@@ -96,7 +96,7 @@ app.post("/login", (req, res) => {
   const username = req.body.username;
 
   if (!username) {
-    res.status(404).send("URL not found");
+    res.status(404).send("Username is required");
   } else {
     res.cookie('username', username);
     res.redirect("/urls");
