@@ -70,13 +70,23 @@ app.get("/u/:id", (req, res) => {
 app.get("/register", (req, res) => {
   const user = users[req.cookies["user_id"]];
   const templateVars = { user };
-  res.render('register', templateVars);
+
+  if (user) {
+    res.redirect("/urls")
+  } else {
+    res.render('register', templateVars);
+  }
 });
 
 app.get("/login", (req, res) => {
   const user = users[req.cookies["user_id"]];
   const templateVars = { user };
-  res.render('login', templateVars);
+
+  if (user) {
+    res.redirect("/urls")
+  } else {
+    res.render('login', templateVars);
+  }
 });
 
 function generateRandomString() {
