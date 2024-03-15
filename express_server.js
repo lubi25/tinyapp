@@ -97,7 +97,7 @@ function generateRandomID() {
   return randomUserID;
 }
 
-function lookUpUser(email) {
+function findUserByEmail(email) {
   return Object.values(users).find(user => user.email === email);
 }
 
@@ -133,7 +133,7 @@ app.post("/urls/:id/update", (req, res) => {
 
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
-  const user = lookUpUser(email, password);
+  const user = findUserByEmail(email);
 
   if (!user) {
     res.status(403).send("User cannot be found");
@@ -159,14 +159,14 @@ app.post("/register", (req, res) => {
   const userID = generateRandomID();
 
   if (!email) {
-    return res.status(400).json({error: 'Email is required'});  
+    return res.status(400).send("Email is required");
   }
 
   if (!password) {
-    return res.status(400).json({error: 'Password is required'});  
+    return res.status(400).send("Password is required");
   }
 
-  const existingUser = lookUpUser(email);
+  const existingUser = findUserByEmail(email);
   if (existingUser) {
     return res.status(400).json({error: 'Email already registered'});
   }
