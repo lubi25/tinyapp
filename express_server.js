@@ -47,7 +47,13 @@ app.get("/urls", (req, res) => {
 app.get("/urls/new", (req, res) => {
   const user = users[req.cookies["user_id"]];
   const templateVars = { user };
-  res.render("urls_new", templateVars);
+
+  if (!user) {
+    res.redirect("/login")
+  }
+  else {
+    res.render("urls_new", templateVars);
+  }
 });
 
 app.get("/urls/:id", (req, res) => {
@@ -63,7 +69,7 @@ app.get("/u/:id", (req, res) => {
     res.redirect(longURL);
   }
   else {
-    res.status(404).send("URL not found");
+    res.status(404).send("Shortened URL does not exist");
   }
 });
 
@@ -112,10 +118,16 @@ function findUserByEmail(email) {
 }
 
 app.post("/urls", (req, res) => {
+  const user = users[req.cookies["user_id"]];
   const longURL = req.body.longURL;
   const shortURL = generateRandomString();
-  urlDatabase[shortURL] = longURL;
-  res.redirect(`/urls/${shortURL}`);
+
+  if (!user) {
+    res.status(400).send("Must log in to shorten URLs");
+  } else {
+    urlDatabase[shortURL] = longURL;
+    res.redirect(`/urls/${shortURL}`);
+  }
 });
 
 app.post("/urls/:id/delete", (req, res) => {
