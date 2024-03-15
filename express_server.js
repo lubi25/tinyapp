@@ -97,8 +97,8 @@ function generateRandomID() {
   return randomUserID;
 }
 
-function lookUpUser(email, password) {
-  return Object.values(users).find(user => user.email === email && user.password === password);
+function lookUpUser(email) {
+  return Object.values(users).find(user => user.email === email);
 }
 
 app.post("/urls", (req, res) => {
@@ -166,7 +166,7 @@ app.post("/register", (req, res) => {
     return res.status(400).json({error: 'Password is required'});  
   }
 
-  const existingUser = lookUpUser(email, password);
+  const existingUser = lookUpUser(email);
   if (existingUser) {
     return res.status(400).json({error: 'Email already registered'});
   }
