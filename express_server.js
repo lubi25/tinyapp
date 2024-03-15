@@ -76,7 +76,7 @@ app.get("/register", (req, res) => {
 app.get("/login", (req, res) => {
   const user = users[req.cookies["user_id"]];
   const templateVars = { user };
-  res.render('register', templateVars);
+  res.render('login', templateVars);
 });
 
 function generateRandomString() {
@@ -95,6 +95,10 @@ function generateRandomID() {
     randomUserID += characters.charAt(Math.floor(Math.random() * characters.length));
   }
   return randomUserID;
+}
+
+function lookUpUser(email, password) {
+  return Object.values(users).find(user => user.email === email && user.password === password);
 }
 
 app.post("/urls", (req, res) => {
@@ -129,11 +133,17 @@ app.post("/urls/:id/update", (req, res) => {
 
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
-  const user = Object.values(users).find(user => user.email === email && user.password === password);
+  const user = lookUpUser(email, password);
 
   if (!user) {
-    res.status(404).send("Username is required");
-  } else {
+    res.status(403).send("User cannot be found");
+  } 
+
+  else if (password !== user.password) {
+    res.status(403).send("Password is incorrect")
+  }
+
+  else {
     res.cookie('user_id', user.id);
     res.redirect("/urls");
   }
@@ -156,7 +166,8 @@ app.post("/register", (req, res) => {
     return res.status(400).json({error: 'Password is required'});  
   }
 
-  if (users[email]) {
+  const existingUser = lookUpUser(email, password);
+  if (existingUser) {
     return res.status(400).json({error: 'Email already registered'});
   }
 
@@ -169,6 +180,6 @@ app.post("/register", (req, res) => {
   users[userID] = newUser;
 
   console.log(users);
-  res.cookie('user_id', userID)
+  res.cookie('user_id', userID);
   res.redirect(`/urls`);
 });
