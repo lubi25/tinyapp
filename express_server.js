@@ -142,6 +142,18 @@ app.post("/register", (req, res) => {
   const { email, password } = req.body;
   const userID = generateRandomID();
 
+  if (!email) {
+    return res.status(400).json({error: 'Email is required'});  
+  }
+
+  if (!password) {
+    return res.status(400).json({error: 'Password is required'});  
+  }
+
+  if (users[email]) {
+    return res.status(400).json({error: 'Email already registered'});
+  }
+
   const newUser = { 
     id: userID,
     email,
