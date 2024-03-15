@@ -73,6 +73,12 @@ app.get("/register", (req, res) => {
   res.render('register', templateVars);
 });
 
+app.get("/login", (req, res) => {
+  const user = users[req.cookies["user_id"]];
+  const templateVars = { user };
+  res.render('register', templateVars);
+});
+
 function generateRandomString() {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let shortURL = '';
