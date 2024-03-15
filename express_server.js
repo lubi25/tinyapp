@@ -44,11 +44,50 @@ app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
 
+
+function generateRandomString() {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let shortURL = '';
+  for (let i = 0; i < 6; i++) {
+    shortURL += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  return shortURL;
+}
+
+function generateRandomID() {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let randomUserID = '';
+  for (let i = 0; i < 12; i++) {
+    randomUserID += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  return randomUserID;
+}
+
+function findUserByEmail(email) {
+  return Object.values(users).find(user => user.email === email);
+}
+
+function urlsForUser(id) {
+  const userURLs = {};
+  for (const shortURL in urlDatabase) {
+    if (urlDatabase[shortURL].userID === id) {
+      userURLs[shortURL] = urlDatabase[shortURL];
+    }
+  }
+  return userURLs;
+}
+
+
 app.get("/urls", (req, res) => {
   const user = users[req.cookies["user_id"]];
-  const templateVars = { urls: urlDatabase, user };
+  if (!user) {
+    return res.render("error", { errorMessage: "Must log in to see URLs", user: null });
+  }
+  const userURLs = urlsForUser(user.id);
+  const templateVars = { urls: userURLs, user };
   res.render("urls_index", templateVars);
 });
+
 
 app.get("/urls/new", (req, res) => {
   const user = users[req.cookies["user_id"]];
@@ -62,13 +101,28 @@ app.get("/urls/new", (req, res) => {
   }
 });
 
+
 app.get("/urls/:id", (req, res) => {
   const user = users[req.cookies["user_id"]];
   const id = req.params.id; 
-  const longURL = urlDatabase[id].longURL; 
-  const templateVars = { id: id, longURL: longURL, user }; 
+  const urlEntry = urlDatabase[id]; 
+  const templateVars = { id, longURL: urlEntry.longURL, user }; 
+
+  if (!user) {
+    return res.render("error", { errorMessage: "Must log in to see URLs", user: null });
+  }
+
+  if (!urlEntry) {
+    return res.render("error", { errorMessage: "URL not found", user });
+  }
+
+  if (urlEntry.userID !== user.id) {
+    return res.render("error", { errorMessage: "You don't own this URL", user });
+  }
+
   res.render("urls_show", templateVars);
 });
+
 
 
 app.get("/u/:id", (req, res) => {
@@ -80,7 +134,6 @@ app.get("/u/:id", (req, res) => {
     res.status(404).send("Shortened URL does not exist");
   }
 });
-
 
 app.get("/register", (req, res) => {
   const user = users[req.cookies["user_id"]];
@@ -104,27 +157,6 @@ app.get("/login", (req, res) => {
   }
 });
 
-function generateRandomString() {
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let shortURL = '';
-  for (let i = 0; i < 6; i++) {
-    shortURL += characters.charAt(Math.floor(Math.random() * characters.length));
-  }
-  return shortURL;
-}
-
-function generateRandomID() {
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let randomUserID = '';
-  for (let i = 0; i < 12; i++) {
-    randomUserID += characters.charAt(Math.floor(Math.random() * characters.length));
-  }
-  return randomUserID;
-}
-
-function findUserByEmail(email) {
-  return Object.values(users).find(user => user.email === email);
-}
 
 app.post("/urls", (req, res) => {
   const user = users[req.cookies["user_id"]];
