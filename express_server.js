@@ -6,8 +6,14 @@ const PORT = 8080;
 app.set("view engine", "ejs");
 
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  b6UTxQ: {
+    longURL: "https://www.tsn.ca",
+    userID: "aJ48lW",
+  },
+  i3BoGr: {
+    longURL: "https://www.google.ca",
+    userID: "aJ48lW",
+  },
 };
 
 const users = {
@@ -58,20 +64,23 @@ app.get("/urls/new", (req, res) => {
 
 app.get("/urls/:id", (req, res) => {
   const user = users[req.cookies["user_id"]];
-  const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id], user };
+  const id = req.params.id; 
+  const longURL = urlDatabase[id].longURL; 
+  const templateVars = { id: id, longURL: longURL, user }; 
   res.render("urls_show", templateVars);
 });
 
+
 app.get("/u/:id", (req, res) => {
   const shortURL = req.params.id;
-  const longURL = urlDatabase[shortURL]
+  const longURL = urlDatabase[shortURL];
   if (longURL) {
-    res.redirect(longURL);
-  }
-  else {
+    res.redirect(longURL.longURL); // Accessing the longURL property of the object
+  } else {
     res.status(404).send("Shortened URL does not exist");
   }
 });
+
 
 app.get("/register", (req, res) => {
   const user = users[req.cookies["user_id"]];
@@ -125,7 +134,10 @@ app.post("/urls", (req, res) => {
   if (!user) {
     res.status(400).send("Must log in to shorten URLs");
   } else {
-    urlDatabase[shortURL] = longURL;
+    urlDatabase[shortURL] = {
+      longURL: longURL,
+      userID: user.id
+    };
     res.redirect(`/urls/${shortURL}`);
   }
 });
@@ -146,7 +158,7 @@ app.post("/urls/:id/update", (req, res) => {
   const newURL = req.body.newURL;
 
   if (urlDatabase.hasOwnProperty(shortURL)) {
-    urlDatabase[shortURL] = newURL;
+    urlDatabase[shortURL].longURL = newURL; // Update the longURL property
     res.redirect("/urls");
   } else {
     res.status(404).send("URL not found");
