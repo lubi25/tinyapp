@@ -176,13 +176,22 @@ app.post("/urls", (req, res) => {
 
 app.post("/urls/:id/delete", (req, res) => {
   const shortURL = req.params.id;
-  if (urlDatabase.hasOwnProperty(shortURL)) {
-    delete urlDatabase[shortURL];
-    res.redirect("/urls");
+  const user = users[req.cookies["user_id"]];
+
+  if (!user) {
+    return res.status(401).send("Must log in to delete URLs");
   }
-  else {
-    res.status(404).send("URL not found");
+
+  if (!urlDatabase.hasOwnProperty(shortURL)) {
+    return res.status(404).send("URL not found");
   }
+
+  if (urlDatabase[shortURL].userID !== user.id) {
+    return res.status(403).send("You don't have permission to delete this URL");
+  }
+
+  delete urlDatabase[shortURL];
+  res.redirect("/urls");
 });
 
 app.post("/urls/:id/update", (req, res) => {
