@@ -42,13 +42,6 @@ app.get("/urls/:id", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
-app.post("/urls", (req, res) => {
-  const longURL = req.body.longURL;
-  const shortURL = generateRandomString();
-  urlDatabase[shortURL] = longURL;
-  res.redirect(`/urls/${shortURL}`);
-});
-
 app.get("/u/:id", (req, res) => {
   const shortURL = req.params.id;
   const longURL = urlDatabase[shortURL]
@@ -60,6 +53,12 @@ app.get("/u/:id", (req, res) => {
   }
 });
 
+app.get("/register", (req, res) => {
+  const username = req.cookies["username"];
+  const templateVars = { username };
+  res.render('register', templateVars);
+});
+
 function generateRandomString() {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let shortURL = '';
@@ -68,6 +67,13 @@ function generateRandomString() {
   }
   return shortURL;
 }
+
+app.post("/urls", (req, res) => {
+  const longURL = req.body.longURL;
+  const shortURL = generateRandomString();
+  urlDatabase[shortURL] = longURL;
+  res.redirect(`/urls/${shortURL}`);
+});
 
 app.post("/urls/:id/delete", (req, res) => {
   const shortURL = req.params.id;
