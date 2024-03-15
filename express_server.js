@@ -10,6 +10,19 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+const users = {
+  userRandomID: {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur",
+  },
+  user2RandomID: {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk",
+  },
+};
+
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
@@ -26,19 +39,20 @@ app.listen(PORT, () => {
 });
 
 app.get("/urls", (req, res) => {
-  const username = req.cookies["username"];
-  const templateVars = { urls: urlDatabase, username };
+  const user = users[req.cookies["user_id"]];
+  const templateVars = { urls: urlDatabase, user };
   res.render("urls_index", templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
-  const templateVars = { username: req.cookies["username"] };
+  const user = users[req.cookies["user_id"]];
+  const templateVars = { user };
   res.render("urls_new", templateVars);
 });
 
 app.get("/urls/:id", (req, res) => {
-  const username = req.cookies["username"];
-  const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id], username };
+  const user = users[req.cookies["user_id"]];
+  const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id], user };
   res.render("urls_show", templateVars);
 });
 
@@ -54,8 +68,8 @@ app.get("/u/:id", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
-  const username = req.cookies["username"];
-  const templateVars = { username };
+  const user = users[req.cookies["user_id"]];
+  const templateVars = { user };
   res.render('register', templateVars);
 });
 
@@ -66,6 +80,15 @@ function generateRandomString() {
     shortURL += characters.charAt(Math.floor(Math.random() * characters.length));
   }
   return shortURL;
+}
+
+function generateRandomID() {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let randomUserID = '';
+  for (let i = 0; i < 12; i++) {
+    randomUserID += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  return randomUserID;
 }
 
 app.post("/urls", (req, res) => {
@@ -99,17 +122,35 @@ app.post("/urls/:id/update", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-  const username = req.body.username;
+  const { email, password } = req.body;
+  const user = Object.values(users).find(user => user.email === email && user.password === password);
 
-  if (!username) {
+  if (!user) {
     res.status(404).send("Username is required");
   } else {
-    res.cookie('username', username);
+    res.cookie('user_id', user.id);
     res.redirect("/urls");
   }
 });
 
 app.post("/logout", (req, res) => {
-  res.clearCookie('username');
+  res.clearCookie('user_id');
   res.redirect("/urls");
+});
+
+app.post("/register", (req, res) => {
+  const { email, password } = req.body;
+  const userID = generateRandomID();
+
+  const newUser = { 
+    id: userID,
+    email,
+    password
+  }
+
+  users[userID] = newUser;
+
+  console.log(users);
+  res.cookie('user_id', userID)
+  res.redirect(`/urls`);
 });
