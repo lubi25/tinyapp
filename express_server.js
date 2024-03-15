@@ -129,7 +129,7 @@ app.get("/u/:id", (req, res) => {
   const shortURL = req.params.id;
   const longURL = urlDatabase[shortURL];
   if (longURL) {
-    res.redirect(longURL.longURL); // Accessing the longURL property of the object
+    res.redirect(longURL.longURL); 
   } else {
     res.status(404).send("Shortened URL does not exist");
   }
@@ -197,13 +197,21 @@ app.post("/urls/:id/delete", (req, res) => {
 app.post("/urls/:id/update", (req, res) => {
   const shortURL = req.params.id;
   const newURL = req.body.newURL;
+  const user = users[req.cookies["user_id"]];
 
-  if (urlDatabase.hasOwnProperty(shortURL)) {
-    urlDatabase[shortURL].longURL = newURL; // Update the longURL property
-    res.redirect("/urls");
-  } else {
-    res.status(404).send("URL not found");
+  if (!user) {
+    return res.status(401).send("Must log in to update URLs");
   }
+
+  if (!urlDatabase.hasOwnProperty(shortURL)) {
+    return res.status(404).send("URL not found");
+  }
+
+  if (urlDatabase[shortURL].userID !== user.id) {
+    return res.status(403).send("You don't have permission to update this URL");
+  }
+    urlDatabase[shortURL].longURL = newURL;
+    res.redirect("/urls");
 });
 
 app.post("/login", (req, res) => {
