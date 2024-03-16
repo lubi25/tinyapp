@@ -1,6 +1,7 @@
 const express = require("express");
 const cookieParser = require('cookie-parser')
 const app = express();
+const bcrypt = require("bcryptjs");
 const PORT = 8080;
 
 app.set("view engine", "ejs");
@@ -221,7 +222,7 @@ app.post("/login", (req, res) => {
     res.status(403).send("User cannot be found");
   } 
 
-  else if (password !== user.password) {
+  else if (!bcrypt.compareSync(password, user.hashedPassword)) {
     res.status(403).send("Password is incorrect")
   }
 
@@ -239,6 +240,7 @@ app.post("/logout", (req, res) => {
 app.post("/register", (req, res) => {
   const { email, password } = req.body;
   const userID = generateRandomID();
+  const hashedPassword = bcrypt.hashSync(password, 10);
 
   if (!email) {
     return res.status(400).send("Email is required");
@@ -256,7 +258,7 @@ app.post("/register", (req, res) => {
   const newUser = { 
     id: userID,
     email,
-    password
+    hashedPassword
   }
 
   users[userID] = newUser;
