@@ -4,6 +4,8 @@ const app = express();
 const bcrypt = require("bcryptjs");
 const PORT = 8080;
 
+const getUserByEmail = require('./helpers.js')
+
 app.set("view engine", "ejs");
 
 const urlDatabase = {
@@ -75,16 +77,6 @@ function generateRandomID() {
     randomUserID += characters.charAt(Math.floor(Math.random() * characters.length));
   }
   return randomUserID;
-}
-
-function getUserByEmail(email, database) {
-  for (const userId in database) {
-    const user = database[userId];
-    if (user.email === email) {
-      return user;
-    }
-  }
-  return null;
 }
 
 function urlsForUser(id) {
