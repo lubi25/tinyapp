@@ -77,8 +77,14 @@ function generateRandomID() {
   return randomUserID;
 }
 
-function findUserByEmail(email) {
-  return Object.values(users).find(user => user.email === email);
+function getUserByEmail(email, database) {
+  for (const userId in database) {
+    const user = database[userId];
+    if (user.email === email) {
+      return user;
+    }
+  }
+  return null;
 }
 
 function urlsForUser(id) {
@@ -149,7 +155,7 @@ app.get("/u/:id", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
-  const user = users[req.session.user_id];
+  const user = getUserByEmail(req.session.user_id, users);
   const templateVars = { user };
 
   if (user) {
@@ -160,7 +166,7 @@ app.get("/register", (req, res) => {
 });
 
 app.get("/login", (req, res) => {
-  const user = users[req.session.user_id];
+  const user = getUserByEmail(req.session.user_id, users);
   const templateVars = { user };
 
   if (user) {
@@ -229,7 +235,7 @@ app.post("/urls/:id/update", (req, res) => {
 
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
-  const user = findUserByEmail(email);
+  const user = getUserByEmail(email, users); // Corrected here
 
   if (!user) {
     res.status(403).send("User cannot be found");
@@ -244,6 +250,7 @@ app.post("/login", (req, res) => {
     res.redirect("/urls");
   }
 });
+
 
 app.post("/logout", (req, res) => {
   req.session.user_id = null;
@@ -263,7 +270,7 @@ app.post("/register", (req, res) => {
     return res.status(400).send("Password is required");
   }
 
-  const existingUser = findUserByEmail(email);
+  const existingUser = getUserByEmail(email, users);
   if (existingUser) {
     return res.status(400).json({error: 'Email already registered'});
   }
