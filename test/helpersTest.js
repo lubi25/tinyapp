@@ -1,4 +1,4 @@
-const { assert } = require('chai');
+const { assert, expect } = require('chai');
 
 const getUserByEmail = require('../helpers.js');
 
@@ -14,9 +14,6 @@ const testUsers = {
     password: "dishwasher-funk"
   }
 };
-
-const chai = require('chai');
-const expect = chai.expect;
 
 describe('getUserByEmail', function() {
   it('should return a user with valid email', function() {
