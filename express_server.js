@@ -124,7 +124,6 @@ app.get("/urls/:id", (req, res) => {
 });
 
 
-
 app.get("/u/:id", (req, res) => {
   const shortURL = req.params.id;
   const longURL = urlDatabase[shortURL];
