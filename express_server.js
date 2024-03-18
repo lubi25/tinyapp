@@ -41,7 +41,7 @@ app.listen(PORT, () => {
 app.get("/urls", (req, res) => {
   const user = users[req.session.user_id];
   if (!user) {
-    return res.render("error", { errorMessage: "Must log in to see URLs", user: null });
+    return res.render("error", { errorMessage: "Welcome to TinyApp! Please log in to see URLs", user: null });
   }
   const userURLs = urlsForUser(user.id);
   const templateVars = { urls: userURLs, user };
@@ -69,15 +69,15 @@ app.get("/urls/:id", (req, res) => {
   const templateVars = { id, longURL: urlEntry.longURL, user }; 
 
   if (!user) {
-    return res.render("error", { errorMessage: "Must log in to see URLs", user: null });
+    return res.render("error", { errorMessage: "Error: Must log in to see URLs", user: null });
   }
 
   if (!urlEntry) {
-    return res.render("error", { errorMessage: "URL not found", user });
+    return res.render("error", { errorMessage: "Error: URL not found", user });
   }
 
   if (urlEntry.userID !== user.id) {
-    return res.render("error", { errorMessage: "You don't own this URL", user });
+    return res.render("error", { errorMessage: "Error: You don't own this URL", user });
   }
 
   res.render("urls_show", templateVars);
