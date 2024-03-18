@@ -1,83 +1,11 @@
 const express = require("express");
-const cookieSession = require('cookie-session')
 const app = express();
+const cookieSession = require("cookie-session");
 const bcrypt = require("bcryptjs");
 const PORT = 8080;
 
-const getUserByEmail = require('./helpers.js')
-
-app.set("view engine", "ejs");
-
-const urlDatabase = {
-  b6UTxQ: {
-    longURL: "https://www.tsn.ca",
-    userID: "aJ48lW",
-  },
-  i3BoGr: {
-    longURL: "https://www.google.ca",
-    userID: "aJ48lW",
-  },
-};
-
-const users = {
-  userRandomID: {
-    id: "userRandomID",
-    email: "user@example.com",
-    password: "purple-monkey-dinosaur",
-  },
-  user2RandomID: {
-    id: "user2RandomID",
-    email: "user2@example.com",
-    password: "dishwasher-funk",
-  },
-};
-
-app.use(express.urlencoded({ extended: true }));
-app.use(cookieSession({
-  name: 'session',
-  keys: [generateRandomKey(32), generateRandomKey(32), generateRandomKey(32)],
-  maxAge: 24 * 60 * 60 * 1000 
-}))
-
-app.get("/", (req, res) => {
-  res.send("Hello!");
-});
-
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
-});
-
-app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}!`);
-});
-
-
-function generateRandomKey(length) {
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let randomKey = '';
-  for (let i = 0; i < length; i++) {
-    randomKey += characters.charAt(Math.floor(Math.random() * characters.length));
-  }
-  return randomKey;
-}
-
-function generateRandomString() {
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let shortURL = '';
-  for (let i = 0; i < 6; i++) {
-    shortURL += characters.charAt(Math.floor(Math.random() * characters.length));
-  }
-  return shortURL;
-}
-
-function generateRandomID() {
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let randomUserID = '';
-  for (let i = 0; i < 12; i++) {
-    randomUserID += characters.charAt(Math.floor(Math.random() * characters.length));
-  }
-  return randomUserID;
-}
+// Import required functions
+const { getUserByEmail, generateRandomKey, generateRandomString, generateRandomID } = require("./helpers.js")
 
 function urlsForUser(id) {
   const userURLs = {};
@@ -89,7 +17,27 @@ function urlsForUser(id) {
   return userURLs;
 }
 
+// Empty variables to house content
+const urlDatabase = {};
+const users = {};
 
+// App set up
+app.set("view engine", "ejs");
+
+app.use(express.urlencoded({extended:false}));
+app.use(express.json());
+
+app.use(cookieSession({
+  name: 'session',
+  keys: [generateRandomKey(32)],
+  maxAge: 24 * 60 * 60 * 1000 
+}))
+
+app.listen(PORT, () => {
+  console.log(`TinyApp listening on port ${PORT}!`);
+});
+
+// Index page with list of URLs (viewable only by registered users)
 app.get("/urls", (req, res) => {
   const user = users[req.session.user_id];
   if (!user) {
@@ -100,7 +48,7 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
-
+// Create new URLs page (viewable only by registered users)
 app.get("/urls/new", (req, res) => {
   const user = users[req.session.user_id];
   const templateVars = { user };
@@ -113,7 +61,7 @@ app.get("/urls/new", (req, res) => {
   }
 });
 
-
+// URLs redirect page after short URL has been generated (also available from URLs index)
 app.get("/urls/:id", (req, res) => {
   const user = users[req.session.user_id];
   const id = req.params.id; 
@@ -135,7 +83,7 @@ app.get("/urls/:id", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
-
+// Redirect link
 app.get("/u/:id", (req, res) => {
   const shortURL = req.params.id;
   const longURL = urlDatabase[shortURL];
@@ -146,6 +94,7 @@ app.get("/u/:id", (req, res) => {
   }
 });
 
+// Registration page
 app.get("/register", (req, res) => {
   const user = getUserByEmail(req.session.user_id, users);
   const templateVars = { user };
@@ -157,6 +106,7 @@ app.get("/register", (req, res) => {
   }
 });
 
+// Login page
 app.get("/login", (req, res) => {
   const user = getUserByEmail(req.session.user_id, users);
   const templateVars = { user };
@@ -168,7 +118,7 @@ app.get("/login", (req, res) => {
   }
 });
 
-
+// Create new URL
 app.post("/urls", (req, res) => {
   const user = users[req.session.user_id];
   const longURL = req.body.longURL;
@@ -185,6 +135,7 @@ app.post("/urls", (req, res) => {
   }
 });
 
+// Delete URL
 app.post("/urls/:id/delete", (req, res) => {
   const shortURL = req.params.id;
   const user = users[req.session.user_id];
@@ -205,6 +156,7 @@ app.post("/urls/:id/delete", (req, res) => {
   res.redirect("/urls");
 });
 
+// Update URL
 app.post("/urls/:id/update", (req, res) => {
   const shortURL = req.params.id;
   const newURL = req.body.newURL;
@@ -225,9 +177,10 @@ app.post("/urls/:id/update", (req, res) => {
     res.redirect("/urls");
 });
 
+// Log into existing account
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
-  const user = getUserByEmail(email, users); // Corrected here
+  const user = getUserByEmail(email, users); 
 
   if (!user) {
     res.status(403).send("User cannot be found");
@@ -243,12 +196,13 @@ app.post("/login", (req, res) => {
   }
 });
 
-
+// Log out
 app.post("/logout", (req, res) => {
   req.session.user_id = null;
   res.redirect("/login");
 });
 
+// Register new account
 app.post("/register", (req, res) => {
   const { email, password } = req.body;
   const userID = generateRandomID();
