@@ -6,7 +6,7 @@ function getUserByEmail(email, database) {
     }
   }
   return null;
-};
+}
 
 function generateRandomKey(length) {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -15,7 +15,7 @@ function generateRandomKey(length) {
     randomKey += characters.charAt(Math.floor(Math.random() * characters.length));
   }
   return randomKey;
-};
+}
 
 function generateRandomString() {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -24,7 +24,7 @@ function generateRandomString() {
     shortURL += characters.charAt(Math.floor(Math.random() * characters.length));
   }
   return shortURL;
-};
+}
 
 function generateRandomID() {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -33,9 +33,9 @@ function generateRandomID() {
     randomUserID += characters.charAt(Math.floor(Math.random() * characters.length));
   }
   return randomUserID;
-};
+}
 
-function urlsForUser(id) {
+function urlsForUser(id, urlDatabase) {
   const userURLs = {};
   for (const shortURL in urlDatabase) {
     if (urlDatabase[shortURL].userID === id) {
@@ -43,6 +43,6 @@ function urlsForUser(id) {
     }
   }
   return userURLs;
-};
+}
 
 module.exports = { getUserByEmail, generateRandomKey, generateRandomString, generateRandomID, urlsForUser };
