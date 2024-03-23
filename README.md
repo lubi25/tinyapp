@@ -17,7 +17,14 @@ Follow these steps to get TinyApp up and running on your local machine:
 1. Clone the repository:
 ```git clone https://github.com/lubi25/tinyapp.git```
 
-2. Install dependencies:
+2. Dependencies:
+- Node.js
+- Express
+- EJS
+- bcryptjs
+- cookie-session
+
+3. Install dependencies:
 ```npm install```
 
 3. Start the application:
