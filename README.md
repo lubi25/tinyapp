@@ -1,6 +1,6 @@
 # TinyApp: URL Shortener
 
-TinyApp is produced as part of a student project for Lighthouse Labs. It is a URL shortener similar to bit.ly, allowing users to shorten long URLs into more shareable links. It provides authentication protection and enables users to perform CRUD (Create, Read, Update, Delete) operations on their shortened URLs. The application is built to react to the user's logged-in state.
+TinyApp is a full stack web application built with Node and Express that allows users to shorten long URLs (à la bit.ly). It provides authentication protection and enables users to perform CRUD (Create, Read, Update, Delete) operations on their shortened URLs. The application is built to react to the user's logged-in state.
 
 ## Features
 
@@ -9,6 +9,13 @@ TinyApp is produced as part of a student project for Lighthouse Labs. It is a UR
 - **URL Shortening**: Convert long URLs into short, easy-to-share links.
 - **CRUD Operations**: Users can Create, Read, Update, and Delete their shortened URLs.
 - **Multipage Application**: The application consists of multiple pages to provide a seamless user experience.
+
+## Final Product
+!["Screenshot of main page"](/docs/_0000_welcome.png)
+!["Screenshot of registration page"](/docs/_0001_register.png)
+!["Screenshot of URL creation page"](/docs/_0002_create-new-url.png)
+!["Screenshot of new URL page"](/docs/_0003_new-url.png)
+!["Screenshot of your URL page"](/docs/_0004_my-urls.png)
 
 ## Getting Started
 
