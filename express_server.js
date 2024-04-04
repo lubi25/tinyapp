@@ -26,10 +26,6 @@ app.use(cookieSession({
   maxAge: 24 * 60 * 60 * 1000
 }));
 
-app.listen(PORT, () => {
-  console.log(`TinyApp listening on port ${PORT}!`);
-});
-
 
 // Index page with list of URLs (viewable only by registered users)
 app.get("/urls", (req, res) => {
@@ -232,4 +228,10 @@ app.post("/register", (req, res) => {
   console.log(users);
   req.session.user_id = userID;
   res.redirect(`/urls`);
+});
+
+
+// App listen on local host
+app.listen(PORT, () => {
+  console.log(`TinyApp listening on port ${PORT}!`);
 });
