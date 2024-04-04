@@ -127,7 +127,7 @@ app.post("/urls", (req, res) => {
   const shortURL = generateRandomString();
 
   if (!user) {
-    res.status(400).send("Must log in to shorten URLs");
+    return res.render("error", { errorMessage: "Must log in to shorten URLs", user: null });
   } else {
     urlDatabase[shortURL] = {
       longURL: longURL,
@@ -140,19 +140,19 @@ app.post("/urls", (req, res) => {
 
 // Delete URL
 app.post("/urls/:id/delete", (req, res) => {
-  const shortURL = req.params.id;
   const user = users[req.session.user_id];
+  const shortURL = req.params.id;
 
   if (!user) {
-    return res.status(401).send("Must log in to delete URLs");
+    return res.render("error", { errorMessage: "Must log in to delete URLs", user: null });
   }
 
   if (!urlDatabase.hasOwnProperty(shortURL)) {
-    return res.status(404).send("URL not found");
+    return res.render("error", { errorMessage: "URL not found", user });
   }
 
   if (urlDatabase[shortURL].userID !== user.id) {
-    return res.status(403).send("You don't have permission to delete this URL");
+    return res.render("error", { errorMessage: "You don't have permission to delete this URL", user });
   }
 
   delete urlDatabase[shortURL];
@@ -167,15 +167,15 @@ app.post("/urls/:id/update", (req, res) => {
   const user = users[req.session.user_id];
 
   if (!user) {
-    return res.status(401).send("Must log in to update URLs");
+    return res.render("error", { errorMessage: "Must log in to update URLs", user: null });
   }
 
   if (!urlDatabase.hasOwnProperty(shortURL)) {
-    return res.status(404).send("URL not found");
+    return res.render("error", { errorMessage: "URL not found", user });
   }
 
   if (urlDatabase[shortURL].userID !== user.id) {
-    return res.status(403).send("You don't have permission to update this URL");
+    return res.render("error", { errorMessage: "You don't have permission to update this URL", user });
   }
   urlDatabase[shortURL].longURL = newURL;
   res.redirect("/urls");
@@ -188,9 +188,9 @@ app.post("/login", (req, res) => {
   const user = getUserByEmail(email, users);
 
   if (!user) {
-    res.status(403).send("User cannot be found");
+    return res.render("error", { errorMessage: "User cannot be found", user });
   } else if (!bcrypt.compareSync(password, user.hashedPassword)) {
-    res.status(403).send("Password is incorrect");
+    return res.render("error", { errorMessage: "Password is incorrect", user });
   } else {
     req.session.user_id = user.id;
     res.redirect("/urls");
