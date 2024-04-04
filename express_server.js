@@ -27,6 +27,12 @@ app.use(cookieSession({
 }));
 
 
+// Redirect to URLs upon entering site
+app.get("/", (req, res) => {
+  res.redirect("/urls");
+});
+
+
 // Index page with list of URLs (viewable only by registered users)
 app.get("/urls", (req, res) => {
   const user = users[req.session.user_id];
@@ -77,12 +83,13 @@ app.get("/urls/:id", (req, res) => {
 
 // Redirect link
 app.get("/u/:id", (req, res) => {
+  const user = users[req.session.user_id];
   const shortURL = req.params.id;
   const longURL = urlDatabase[shortURL];
   if (longURL) {
     res.redirect(longURL.longURL);
   } else {
-    res.status(404).send("Shortened URL does not exist");
+    return res.render("error", { errorMessage: "Shortened URL does not exist", user });
   }
 });
 
