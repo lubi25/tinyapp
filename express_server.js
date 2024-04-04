@@ -200,28 +200,29 @@ app.post("/login", (req, res) => {
 
 // Log out
 app.post("/logout", (req, res) => {
-  req.session.user_id = null;
+  req.session = null;
   res.redirect("/login");
 });
 
 
 // Register new account
 app.post("/register", (req, res) => {
+  const user = users[req.session.user_id];
   const { email, password } = req.body;
   const userID = generateRandomID();
   const hashedPassword = bcrypt.hashSync(password, 10);
 
   if (!email) {
-    return res.status(400).send("Email is required");
+    return res.render("error", { errorMessage: "Email is required", user });
   }
 
   if (!password) {
-    return res.status(400).send("Password is required");
+    return res.render("error", { errorMessage: "Password is required", user });
   }
 
   const existingUser = getUserByEmail(email, users);
   if (existingUser) {
-    return res.status(400).json({error: 'Email already registered'});
+    return res.render("error", { errorMessage: "Email is already registered", user });
   }
 
   const newUser = {
