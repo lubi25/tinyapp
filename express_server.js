@@ -6,7 +6,7 @@ const PORT = 8080;
 
 
 // Import required functions
-const { getUserByEmail, generateRandomKey, generateRandomString, generateRandomID, urlsForUser } = require("./helpers.js");
+const { getUserByEmail, generateRandom, urlsForUser } = require("./helpers.js");
 
 
 // Empty variables to house content
@@ -22,7 +22,7 @@ app.use(express.json());
 
 app.use(cookieSession({
   name: 'session',
-  keys: [generateRandomKey(32)],
+  keys: [generateRandom(32)],
   maxAge: 24 * 60 * 60 * 1000
 }));
 
@@ -124,7 +124,7 @@ app.get("/login", (req, res) => {
 app.post("/urls", (req, res) => {
   const user = users[req.session.user_id];
   const longURL = req.body.longURL;
-  const shortURL = generateRandomString();
+  const shortURL = generateRandom(6);
 
   if (!user) {
     return res.render("error", { errorMessage: "Must log in to shorten URLs", user: null });
@@ -209,7 +209,7 @@ app.post("/logout", (req, res) => {
 app.post("/register", (req, res) => {
   const user = users[req.session.user_id];
   const { email, password } = req.body;
-  const userID = generateRandomID();
+  const userID = generateRandom(12);
   const hashedPassword = bcrypt.hashSync(password, 10);
 
   if (!email) {
