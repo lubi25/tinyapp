@@ -63,7 +63,6 @@ app.get("/urls/:id", (req, res) => {
   const user = users[req.session.user_id];
   const id = req.params.id;
   const urlEntry = urlDatabase[id];
-  const templateVars = { id, longURL: urlEntry.longURL, user };
 
   if (!user) {
     return res.render("error", { errorMessage: "Error: Must log in to see URLs", user: null });
@@ -77,6 +76,7 @@ app.get("/urls/:id", (req, res) => {
     return res.render("error", { errorMessage: "Error: You don't own this URL", user });
   }
 
+  const templateVars = { id, longURL: urlEntry.longURL, user };
   res.render("urls_show", templateVars);
 });
 
