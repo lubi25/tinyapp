@@ -8,31 +8,13 @@ function getUserByEmail(email, database) {
   return null;
 }
 
-function generateRandomKey(length) {
+function generateRandom(length) {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let randomKey = '';
+  let randomValue = '';
   for (let i = 0; i < length; i++) {
-    randomKey += characters.charAt(Math.floor(Math.random() * characters.length));
+    randomValue += characters.charAt(Math.floor(Math.random() * characters.length));
   }
-  return randomKey;
-}
-
-function generateRandomString() {
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let shortURL = '';
-  for (let i = 0; i < 6; i++) {
-    shortURL += characters.charAt(Math.floor(Math.random() * characters.length));
-  }
-  return shortURL;
-}
-
-function generateRandomID() {
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let randomUserID = '';
-  for (let i = 0; i < 12; i++) {
-    randomUserID += characters.charAt(Math.floor(Math.random() * characters.length));
-  }
-  return randomUserID;
+  return randomValue;
 }
 
 function urlsForUser(id, urlDatabase) {
@@ -45,4 +27,4 @@ function urlsForUser(id, urlDatabase) {
   return userURLs;
 }
 
-module.exports = { getUserByEmail, generateRandomKey, generateRandomString, generateRandomID, urlsForUser };
+module.exports = { getUserByEmail, generateRandom, urlsForUser };
