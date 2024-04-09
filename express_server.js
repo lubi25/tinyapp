@@ -188,9 +188,9 @@ app.post("/login", (req, res) => {
   const user = getUserByEmail(email, users);
 
   if (!user) {
-    return res.render("error", { errorMessage: "User cannot be found", user });
+    return res.render("error", { errorMessage: "User cannot be found", user: null });
   } else if (!bcrypt.compareSync(password, user.hashedPassword)) {
-    return res.render("error", { errorMessage: "Password is incorrect", user });
+    return res.render("error", { errorMessage: "Password is incorrect", user: null });
   } else {
     req.session.user_id = user.id;
     res.redirect("/urls");
